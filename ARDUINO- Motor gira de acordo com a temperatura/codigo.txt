@@ -1,0 +1,42 @@
+#include <Thermistor.h>
+
+Thermistor temp(0);
+int motor = 6;
+int termistor = 1;
+int velocidade = 0;
+
+
+void setup() {
+  Serial.begin(9600);
+  pinMode (motor, OUTPUT);
+  pinMode (termistor, INPUT);
+
+}
+
+void loop() {
+  
+  int temperatura = temp.getTemp();
+  Serial.print("Temperatura aproximada: ");
+  Serial.print(temperatura);
+  Serial.println("*C");
+  delay(1000);
+  temperatura = analogRead(termistor);
+
+  if (temperatura < 450){
+  velocidade = 0;
+  }
+
+  else if (temperatura > 650){
+  velocidade = 255;
+  }
+
+  else{
+
+    velocidade = map(temperatura, 450, 650, 0, 255);
+    delay(100);
+  }
+ 
+  analogWrite (motor, velocidade);
+  delay(100);
+      
+}
