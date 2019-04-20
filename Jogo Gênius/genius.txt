@@ -1,0 +1,146 @@
+#define som_1  280
+#define som_2  370
+#define som_3  400
+#define som_4  850
+
+int sons[4] = {som_1, som_2, som_3, som_4 };
+int buzzer = 6;
+int pinLeds[4] = { 8, 9, 10, 11 };
+int pinBotoes[4] = { 2, 3, 4, 5 };
+int sequencia[100] = {};
+int fase = 0;
+int passo_em_sequencia = 0;
+int estadoBotao = 0;
+int game_over = false;
+
+void setup() {
+  randomSeed(analogRead(0));
+  for (int i = 0; i <= 3; i++) {
+    pinMode(pinLeds[i], OUTPUT);
+  } 
+  for (int i = 0; i <= 3; i++) {
+    pinMode(pinBotoes[i], INPUT);
+  }
+  pinMode(buzzer, OUTPUT);
+
+}
+ 
+void loop() {
+
+  if (game_over) {
+    int sequencia[100] = {};
+    fase = 0;
+    passo_em_sequencia = 0;
+    game_over = false;
+
+  }
+  if (fase == 0) {
+
+    inicio_do_jogo();
+    delay(500);
+  }
+  next_fase();
+  reproduzirSequencia();
+  aguardando_jogador();
+  delay(500);
+}
+void inicio_do_jogo() {
+
+  tone(buzzer, sons[0]);
+  digitalWrite(pinLeds[0], HIGH); 
+  digitalWrite(pinLeds[1], HIGH);
+  digitalWrite(pinLeds[2], HIGH);
+  digitalWrite(pinLeds[3], HIGH);
+  delay(500);
+  digitalWrite(pinLeds[0], LOW);
+  digitalWrite(pinLeds[1], LOW);
+  digitalWrite(pinLeds[2], LOW);
+  digitalWrite(pinLeds[3], LOW);
+  delay(500);
+  noTone(buzzer);
+}
+
+void next_fase() {
+
+  int numero_aleatorio = random(0, 4);
+
+  sequencia[fase++] = numero_aleatorio;
+
+}
+
+void reproduzirSequencia() {
+  for (int i = 0; i < fase; i++) {
+    tone(buzzer,sons[sequencia[i]]);
+    digitalWrite(pinLeds[sequencia[i]], HIGH);
+    delay(500);
+    noTone(buzzer);
+    digitalWrite(pinLeds[sequencia[i]], LOW);
+    delay(100);
+  }
+  noTone(buzzer);
+} 
+
+void aguardando_jogador() {
+
+  for (int i = 0; i < fase; i++) {
+   
+    aguardarJogada();
+    verificarJogada();
+
+    if (game_over) {
+      break;
+    }
+    passo_em_sequencia++;
+  }
+  passo_em_sequencia = 0;
+}
+
+ 
+void aguardarJogada() {
+
+  boolean jogada_realizada = false;
+
+  while (!jogada_realizada) {
+
+    for (int i = 0; i <= 3; i++) {
+
+      if (digitalRead(pinBotoes[i]) == HIGH) {
+  
+        estadoBotao = i;
+        tone(buzzer, sons[i]);
+        digitalWrite(pinLeds[i], HIGH);
+        delay(300);
+        digitalWrite(pinLeds[i], LOW);
+        noTone(buzzer);
+        jogada_realizada = true;
+      }
+    }
+    delay(100);
+  }
+}
+
+ 
+void verificarJogada() {
+  if (sequencia[passo_em_sequencia] != estadoBotao) {
+
+    for (int i = 0; i <= 3; i++) {
+      tone(buzzer, sons[i]);
+      digitalWrite(pinLeds[i], HIGH);
+      delay(200);
+      digitalWrite(pinLeds[i], LOW);
+      noTone(buzzer);
+    }
+    tone(buzzer, sons[3]);
+
+    for (int i = 0; i <= 3; i++) {
+      digitalWrite(pinLeds, HIGH);
+      delay(50);
+      digitalWrite(pinLeds, LOW);
+      delay(50);
+    }
+    noTone(buzzer);
+    game_over = true;
+  }
+
+}
+ 
